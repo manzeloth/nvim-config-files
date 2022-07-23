@@ -6,27 +6,30 @@
 
 " || -- VANILLA CONFIG. -- || "
 
-" enable mouse support "
+" Enable mouse support 
 set mouse=a
 
-" enable syntax "
+" Enable syntax
 syntax on
 
-" enable line numbers "
+" Enable line numbers
 set number
 
-" highlight current line "
+" Highlight current line
 set cursorline
-:highlight Cursorline cterm=bold ctermbg=black
+highlight Cursorline cterm=bold ctermbg=black
 
-" enable highlight search pattern "
+" Highlight Pmenu box color
+highlight Pmenu ctermbg=014
+
+" Enable highlight search pattern
 set hlsearch
 
-" enable smartcase search sensitivity "
+" Enable smartcase search sensitivity
 set ignorecase
 set smartcase
 
-" indentation using spaces "
+" Indentation using spaces
 set tabstop =4
 set softtabstop =4
 set shiftwidth =4
@@ -34,16 +37,28 @@ set textwidth =79
 set expandtab
 set autoindent
 
-" show the matching parts of pairs [] {} () "
+" Show the matching parts of pairs [] {} ()
 set showmatch
 
+" Change between tabs
+nnoremap <C-Left> :tabprevious<CR>
+nnoremap <C-Right> :tabnext<CR>
+
+" New leader key
+let mapleader=","
+set timeout timeoutlen=1500
 
 
 
 
-" || -- OWN COMMANDS -- || "
 
-" live-server options "
+
+" || -- OWN COMMANDS (or future plugins) -- || "
+
+" Nvim reload
+command Reload source ~/.config/nvim/init.vim
+
+" Live-server command
 function LiveServer(action)
     if a:action == "start"
         tabe 
@@ -83,6 +98,7 @@ Plug 'preservim/nerdtree'
 Plug 'ryanoasis/vim-devicons'
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 Plug 'preservim/nerdcommenter'
+Plug 'mattn/emmet-vim'
 
 call plug#end()
 
@@ -90,13 +106,13 @@ call plug#end()
 
 
 
-" || -- PLUGINS CONFIG. -- || "
+" || -- GENERAL PLUGINS CONFIG. -- || "
 
-" airline theme "
+" Airline theme
 let g:airline_theme='solarized'
 let g:airline_solarized_bg='dark'
 
-" use <tab> for trigger completion and navigate to the next complete item "
+" Use <tab> for trigger completion and navigate to the next complete item
 function! s:check_back_space() abort
 let col = col('.') - 1
 return !col || getline('.')[col - 1]  =~ '\s'
@@ -107,11 +123,20 @@ inoremap <silent><expr> <Tab>
 \ <SID>check_back_space() ? "\<Tab>" :
 \ coc#refresh()
 
+" NERDTree toggle command
+map <F2> :NERDTreeToggle<CR>
+
+" Prettier command (from coc.nvim)
+command! -nargs=0 Prettier :CocCommand prettier.forceFormatDocument
 
 
 
 
-" coc nvim config "
+
+
+" || -- COC.NVIM CONFIG. FOR AUTO-COMPLETION -- || "
+" Example config for coc.nvim from Github page:
+
 " Set internal encoding of vim, not needed on neovim, since coc.nvim using some
 " unicode characters in the file autoload/float.vim
 set encoding=utf-8
@@ -283,13 +308,23 @@ nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 
 
 
-" nerdtree toggle command "
-map <F2> :NERDTreeToggle<CR>
+" || -- CSS SPECIFIC CONFIG. -- || "
 
-" change between tabs "
-nnoremap <C-Left> :tabprevious<CR>
-nnoremap <C-Right> :tabnext<CR>
+" CSS Comments
+function CssComment(type)
+    if a:type == "section"
+        r~/.config/nvim/templates/css/new-section.txt
+    else
+        echo "Enter a valid argument."
+    endif
+endfunction
 
-" new leader key (for nerdcommenter)"
-let mapleader=","
-set timeout timeoutlen=1500
+function! CompletionCssComment(ArgLead, CmdLine, CursorPos)
+  return ['section']
+endfunction
+
+command -nargs=1 -complete=customlist,CompletionCssComment CssComment exec CssComment(<q-args>)
+
+
+" SASS Auto-compiler
+autocmd bufwritepost *.sass,*.scss silent exec "!sass %:p %:r.css"
