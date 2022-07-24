@@ -6,6 +6,10 @@
 
 " || -- VANILLA CONFIG. -- || "
 
+" Set new titlebar
+set titlestring=Neovim
+autocmd VimEnter * set title
+
 " Enable mouse support 
 set mouse=a
 
@@ -56,9 +60,9 @@ set timeout timeoutlen=1500
 " || -- OWN COMMANDS (or future plugins) -- || "
 
 " Nvim reload
-command Reload source ~/.config/nvim/init.vim
+command Reload silent source ~/.config/nvim/init.vim
 
-" Live-server command
+" Live server command (requires live-server npm package)
 function LiveServer(action)
     if a:action == "start"
         tabe 
@@ -326,5 +330,5 @@ endfunction
 command -nargs=1 -complete=customlist,CompletionCssComment CssComment exec CssComment(<q-args>)
 
 
-" SASS Auto-compiler
-autocmd bufwritepost *.sass,*.scss silent exec "!sass %:p %:r.css"
+" SASS/SCSS Auto-compiler (requires sass npm package)
+autocmd bufwritepost [^_]*.sass,[^_]*.scss silent exec "!sass '%:p' 'css/%:t:r.css'"
