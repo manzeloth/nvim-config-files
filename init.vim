@@ -52,6 +52,8 @@ nnoremap <C-Right> :tabnext<CR>
 let mapleader=","
 set timeout timeoutlen=1500
 
+" External clipboard
+set clipboard+=unnamedplus
 
 
 
@@ -61,29 +63,6 @@ set timeout timeoutlen=1500
 
 " Nvim reload
 command Reload silent source ~/.config/nvim/init.vim
-
-" Live server command (requires live-server npm package)
-function LiveServer(action)
-    if a:action == "start"
-        tabe 
-        term live-server
-        tabclose
-        echo "Started a new live-server (npm) instance."
-    elseif a:action == "stop"
-        let buffers = filter(range(1, bufnr('$')), 'buflisted(v:val) && bufname(v:val) =~ "\.'."live-server".'$"')
-        if empty(buffers) |throw "no *."."live-server"." buffer" | endif
-        exe 'bd! '.join(buffers, ' ')
-        echo "Stopped all live-server instances (npm)."
-    else
-        echo "Enter a valid argument: start/stop."
-    endif
-endfunction
-
-function! CompletionLiveServer(ArgLead, CmdLine, CursorPos)
-  return ['start', 'stop']
-endfunction
-
-command -nargs=1 -complete=customlist,CompletionLiveServer LiveServer exec LiveServer(<q-args>)
 
 
 
@@ -103,6 +82,7 @@ Plug 'ryanoasis/vim-devicons'
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 Plug 'preservim/nerdcommenter'
 Plug 'mattn/emmet-vim'
+Plug 'manzeloth/live-server'
 
 call plug#end()
 
@@ -331,4 +311,4 @@ command -nargs=1 -complete=customlist,CompletionCssComment CssComment exec CssCo
 
 
 " SASS/SCSS Auto-compiler (requires sass npm package)
-autocmd bufwritepost [^_]*.sass,[^_]*.scss silent exec "!sass '%:p' 'css/%:t:r.css'"
+autocmd bufwritepost [^_]*.sass,[^_]*.scss silent exec "!sass '%:p' 'css/%:t:r.css' --style=compressed --no-source-map=none"
